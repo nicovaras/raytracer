@@ -11,5 +11,5 @@ set(SOURCE_FILES raytracer.cc ray.cpp Vec3.cpp)
 add_executable(raytracer main.cpp ${SOURCE_FILES})
 target_link_libraries( raytracer ${OpenCV_LIBS} )
 
-add_executable(runTests test/test.cc test/testVec3.cc ${SOURCE_FILES})
+add_executable(runTests test/test.cc test/testVec3.cc test/testRay.cc ${SOURCE_FILES})
 target_link_libraries(runTests ${GTEST_LIBRARIES} ${OpenCV_LIBS} pthread)
