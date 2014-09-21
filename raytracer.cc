@@ -1,9 +1,11 @@
 
 #include "raytracer.h"
+
 using namespace cv;
 
-Raytracer::Raytracer(int x, int y) {
+Raytracer::Raytracer(int x, int y, Scene scene) {
     image = Mat(x, y, CV_8UC3);
+    this->scene = scene;
 }
 
 
@@ -12,12 +14,16 @@ void Raytracer::show_result() {
     waitKey(0);
 }
 
-
 void Raytracer::raytrace() {
     for (int x = 0; x < image.rows; ++x) {
         for (int y = 0; y < image.cols; ++y) {
-            Ray view_ray(Vec3(x, y, -1000.0), Vec3(0.0, 0.0, 1.0));
-            set_pixel_rgb(x, y, Color(x, y, x + y));
+            Ray view_ray(Vec3(x, y, -100.0), Vec3(0.0, 0.0, 1.0));
+            for(Scene::iterator i = scene.begin(); i != scene.end(); i++){
+                double t = (*i)->intersectScalar(view_ray);
+                if(t > 0.0){
+                    set_pixel_rgb(x, y, Color(x, y, x+y));
+                }
+            }
         }
     }
 }
