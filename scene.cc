@@ -28,6 +28,17 @@ double Sphere::intersectScalar(Ray r){
     }
 }
 
+Vec3 Sphere::normal(Vec3 point) {
+    Vec3 normal = Vec3((point.x - pos.x)/radius,
+                       (point.y - pos.y)/radius,
+                       (point.z - pos.z)/radius);
+    return normal;
+}
+
 void Scene::addToScene(SceneObject* object) {
     sceneObjects.push_back(object);
+}
+
+void Scene::addToScene(Light *light) {
+    lights.push_back(light);
 }

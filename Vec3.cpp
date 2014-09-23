@@ -1,3 +1,4 @@
+#include <math.h>
 #include "Vec3.hpp"
 
 
@@ -27,4 +28,8 @@ std::ostream& operator<<(std::ostream& os, const Vec3& v){
 
 double operator*(Vec3 const &lhs, Vec3 const &rhs) {
     return lhs.x *rhs.x + lhs.y *rhs.y + lhs.z *rhs.z;
+}
+
+double Vec3::norm() {
+    return sqrt(x*x + y*y + z*z);
 }

@@ -18,6 +18,8 @@ public:
     friend Vec3 operator*(const Vec3&, float f);
     friend double operator*(const Vec3&, const Vec3&);
     friend bool operator==(const Vec3&, const Vec3&);
+
+    double norm();
 };
 
 

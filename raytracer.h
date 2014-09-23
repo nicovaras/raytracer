@@ -3,18 +3,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "ray.h"
 #include "scene.h"
+#include "color.h"
 
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
 
 using namespace cv;
 
-struct Color{
-    Color(int r, int g, int b) : r(r), g(g), b(b) {}
-    int r;
-    int g;
-    int b;
-};
 
 class Raytracer{
 public:
