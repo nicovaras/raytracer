@@ -38,8 +38,8 @@ public:
 class Light{
 public:
     Light(Vec3 pos, Vec3 dir) : pos(pos),
-                                dir(dir),
-                                ambient_coef(0.1){};
+                                dir(dir) { };
+
     Vec3 vectorFrom(Vec3 point){
         Vec3 l = Vec3(pos.x - point.x, pos.y - point.y, pos.z - point.z);
         l = l * (1/l.norm());
@@ -47,12 +47,12 @@ public:
     }
     Vec3 pos;
     Vec3 dir;
-    double ambient_coef;
 };
 
 //Borrar y poner un vector y fue...
 class Scene{
 public:
+    Scene() : ambient_coef(0.1) {};
     void addToScene(SceneObject*);
     void addToScene(Light*);
     typedef std::vector<SceneObject*>::iterator iterator;
@@ -62,6 +62,7 @@ public:
     light_iterator l_begin() { return lights.begin(); }
     light_iterator l_end() { return lights.end(); }
 
+    double ambient_coef;
 
 private:
     std::vector<SceneObject*> sceneObjects;
