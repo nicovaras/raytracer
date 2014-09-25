@@ -25,6 +25,6 @@ Scene get_scene() {
     s.addToScene(new Sphere(100.0, Vec3(600,200,0), Color(0,30,255)));
     s.addToScene(new Sphere(100.0, Vec3(120,700,0), Color(50,30,55)));
     s.addToScene(new Sphere(100.0, Vec3(800,600,0), Color(255,255,255)));
-    s.addToScene(new Light(Vec3(0.0,0.0,0.0),Vec3(1.0,0.0,0.0)));
+    s.addToScene(new Light(Vec3(500.0,500.0,-300.0),Vec3(1.0,0.0,0.0)));
     return s;
 }

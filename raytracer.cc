@@ -47,17 +47,25 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
                     cosine_factor * G * kd + G * ka,
                     cosine_factor * B * kd + B * ka);
 
-        Ray lr = Ray(point, (*l)->dir - point);
-        for(int i =0;i<100;i++){
-            int x1 = int (point.x + i*(lr.getDir().x));
-            int y1 = int (point.y + i*(lr.getDir().y));
-            if(x1 > 0 && y1 > 0)
-            set_pixel_rgb(x1,
-                          y1,
-                          Color(255,255,255));
-        }
+        Vec3 lr_dir = (*l)->pos - point;
+        Ray lr = Ray(point, lr_dir* (1.0/ lr_dir.norm()));
+
         add_shadow(&color, lr, (*scene_obj));
+        draw_light(lr);
+
         set_pixel_rgb(x, y, color);
+    }
+}
+
+void Raytracer::draw_light(Ray lr) {
+    if(rand()%1000 < 1) {
+        for (int i = 0; i < 1000; i++) {
+            int x1 = int(lr.getPos().x + i * (lr.getDir().x));
+            int y1 = int(lr.getPos().y + i * (lr.getDir().y));
+            if (x1 >= 0 && y1 >= 0 && x1 < 1000 && y1 < 1000) {
+                set_pixel_rgb(x1, y1, Color(255, 255, 255));
+            }
+        }
     }
 }
 
@@ -72,9 +80,11 @@ void Raytracer::add_shadow(Color *color, Ray ray, SceneObject* obj) {
         if(obj == (*scene_obj)) continue;
         double t = (*scene_obj)->intersectScalar(ray);
         if (t > 0.0) {
-            color->r = int(color->r /2);
-            color->g = int(color->g /2);
-            color->b = int(color->b /2);
+
+            color->r = int(color->r * 0.7);
+            color->g = int(color->g * 0.7);
+            color->b = int(color->b * 0.7);
+
             return;
         }
     }
