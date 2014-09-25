@@ -26,7 +26,7 @@ private:
     void set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene::iterator scene_obj, double t, Scene::light_iterator l);
     void add_shadow(Color * , Ray, SceneObject *);
 
-    void draw_light(Ray lr);
+    void draw_light(Ray lr, Vec3 limit);
 };
 
 #endif

@@ -51,17 +51,22 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
         Ray lr = Ray(point, lr_dir* (1.0/ lr_dir.norm()));
 
         add_shadow(&color, lr, (*scene_obj));
-        draw_light(lr);
+        draw_light(lr, (*l)->pos);
 
         set_pixel_rgb(x, y, color);
     }
 }
 
-void Raytracer::draw_light(Ray lr) {
+void Raytracer::draw_light(Ray lr, Vec3 limit) {
     if(rand()%1000 < 1) {
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 500; i++) {
             int x1 = int(lr.getPos().x + i * (lr.getDir().x));
             int y1 = int(lr.getPos().y + i * (lr.getDir().y));
+            if(lr.getDir().x > 0 && x1 > limit.x) continue;
+            if(lr.getDir().x < 0 && x1 < limit.x) continue;
+            if(lr.getDir().y > 0 && y1 > limit.y) continue;
+            if(lr.getDir().y > 0 && y1 > limit.y) continue;
+
             if (x1 >= 0 && y1 >= 0 && x1 < 1000 && y1 < 1000) {
                 set_pixel_rgb(x1, y1, Color(255, 255, 255));
             }
