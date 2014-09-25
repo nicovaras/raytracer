@@ -1,8 +1,10 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-struct Color{
+class Color{
+public:
     Color(int r, int g, int b) : r(r), g(g), b(b) {
+
     }
     int r;
     int g;

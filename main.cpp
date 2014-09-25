@@ -19,12 +19,12 @@ int main() {
 
 Scene get_scene() {
     Scene s = Scene();
-    s.addToScene(new Sphere(100.0, Vec3(500,800,500), Color(100,200,255)));
-    s.addToScene(new Sphere(100.0, Vec3(200,200,500), Color(200,100,255)));
-    s.addToScene(new Sphere(100.0, Vec3(400,400,500), Color(200,100,0)));
-    s.addToScene(new Sphere(100.0, Vec3(600,200,500), Color(0,30,255)));
-    s.addToScene(new Sphere(100.0, Vec3(120,700,50), Color(50,30,55)));
-    s.addToScene(new Sphere(100.0, Vec3(800,600,50), Color(255,255,255)));
-    s.addToScene(new Light(Vec3(0.0,0.0,-1000.0),Vec3(0.0,0.0,-1000.0)));
+    s.addToScene(new Sphere(100.0, Vec3(500,800,0), Color(100,200,255)));
+    s.addToScene(new Sphere(100.0, Vec3(200,200,0), Color(200,100,255)));
+    s.addToScene(new Sphere(100.0, Vec3(400,400,0), Color(200,100,0)));
+    s.addToScene(new Sphere(100.0, Vec3(600,200,0), Color(0,30,255)));
+    s.addToScene(new Sphere(100.0, Vec3(120,700,0), Color(50,30,55)));
+    s.addToScene(new Sphere(100.0, Vec3(800,600,0), Color(255,255,255)));
+    s.addToScene(new Light(Vec3(0.0,0.0,0.0),Vec3(1.0,0.0,0.0)));
     return s;
 }
