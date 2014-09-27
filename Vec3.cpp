@@ -33,3 +33,7 @@ double operator*(Vec3 const &lhs, Vec3 const &rhs) {
 double Vec3::norm() {
     return sqrt(x*x + y*y + z*z);
 }
+
+Vec3 Vec3::unit() {
+    return operator*((*this), 1.0/ this->norm());
+}

@@ -36,30 +36,29 @@ void Raytracer::cast_ray_on(int x, int y) {
 void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene::iterator scene_obj, double t, Scene::light_iterator l) {
     Vec3 point = view_ray.point_on(t);
     double cosine_factor = (*scene_obj)->normal(point) * (*l)->vectorFrom(point);
+    double ka = scene.ambient_coef;
+    double kd = (*scene_obj)->diffusion_coef;
+    double  R = (*scene_obj)->color.r,
+            G = (*scene_obj)->color.g,
+            B = (*scene_obj)->color.b;
+    Color color = Color(R * ka, G * ka, B * ka);
     if (cosine_factor > 0.0f) {
-        double kd = (*scene_obj)->diffusion_coef;
-        double ka = scene.ambient_coef;
-        double R = (*scene_obj)->color.r,
-                G = (*scene_obj)->color.g,
-                B = (*scene_obj)->color.b;
-        Color color = Color(
-                    cosine_factor * R * kd + R * ka,
-                    cosine_factor * G * kd + G * ka,
-                    cosine_factor * B * kd + B * ka);
+        color.r += cosine_factor * R * kd;
+        color.g += cosine_factor * G * kd;
+        color.b += cosine_factor * B * kd;
 
         Vec3 lr_dir = (*l)->pos - point;
-        Ray lr = Ray(point, lr_dir* (1.0/ lr_dir.norm()));
-
+        Ray lr = Ray(point, lr_dir.unit());
+//        draw_light(lr, (*l)->pos );
         add_shadow(&color, lr, (*scene_obj));
-        draw_light(lr, (*l)->pos);
-
-        set_pixel_rgb(x, y, color);
     }
+    set_pixel_rgb(x, y, color);
+
 }
 
 void Raytracer::draw_light(Ray lr, Vec3 limit) {
     if(rand()%1000 < 1) {
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 1000; i++) {
             int x1 = int(lr.getPos().x + i * (lr.getDir().x));
             int y1 = int(lr.getPos().y + i * (lr.getDir().y));
             if(lr.getDir().x > 0 && x1 > limit.x) continue;
@@ -84,11 +83,11 @@ void Raytracer::add_shadow(Color *color, Ray ray, SceneObject* obj) {
     for (Scene::iterator scene_obj = scene.begin(); scene_obj != scene.end(); scene_obj++) {
         if(obj == (*scene_obj)) continue;
         double t = (*scene_obj)->intersectScalar(ray);
-        if (t > 0.0) {
-
-            color->r = int(color->r * 0.7);
-            color->g = int(color->g * 0.7);
-            color->b = int(color->b * 0.7);
+        double dir = obj->normal(ray.point_on(t)) * (*scene_obj)->normal(ray.point_on(t));
+        if (t > 0.0 && dir < 0.0) {
+            color->r = int(color->r * 0.5);
+            color->g = int(color->g * 0.5);
+            color->b = int(color->b * 0.5);
 
             return;
         }

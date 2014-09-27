@@ -20,6 +20,7 @@ public:
     friend bool operator==(const Vec3&, const Vec3&);
 
     double norm();
+    Vec3 unit();
 };
 
 
