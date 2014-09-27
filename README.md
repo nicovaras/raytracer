@@ -2,5 +2,5 @@ Raytracer
 =========
 Raytracer in C++
 
-![alt tag](http://i.imgur.com/BrYz2KY.png)
+![Current state](http://i.imgur.com/r71HHjv.png)
 
