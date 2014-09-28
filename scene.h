@@ -2,6 +2,7 @@
 #include "ray.h"
 #include <vector>
 #include "color.h"
+#include "light.h"
 
 #ifndef SCENE_H
 #define SCENE_H
@@ -35,19 +36,7 @@ public:
     Vec3 pos;
 };
 
-class Light{
-public:
-    Light(Vec3 pos, Vec3 dir) : pos(pos),
-                                dir(dir) { };
 
-    Vec3 vectorFrom(Vec3 point){
-        Vec3 l = Vec3(pos.x - point.x, pos.y - point.y, pos.z - point.z);
-        l = l * (1/l.norm());
-        return l;
-    }
-    Vec3 pos;
-    Vec3 dir;
-};
 
 //Borrar y poner un vector y fue...
 class Scene{

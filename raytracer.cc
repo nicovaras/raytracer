@@ -19,6 +19,7 @@ void Raytracer::raytrace() {
             cast_ray_on(x, y);
         }
     }
+    draw_lights();
 }
 
 void Raytracer::cast_ray_on(int x, int y) {
@@ -49,14 +50,14 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
 
         Vec3 lr_dir = (*l)->pos - point;
         Ray lr = Ray(point, lr_dir.unit());
-//        draw_light(lr, (*l)->pos );
+//        draw_ray(lr, (*l)->pos );
         add_shadow(&color, lr, (*scene_obj));
     }
     set_pixel_rgb(x, y, color);
 
 }
 
-void Raytracer::draw_light(Ray lr, Vec3 limit) {
+void Raytracer::draw_ray(Ray lr, Vec3 limit) {
     if(rand()%1000 < 1) {
         for (int i = 0; i < 1000; i++) {
             int x1 = int(lr.getPos().x + i * (lr.getDir().x));
@@ -91,5 +92,11 @@ void Raytracer::add_shadow(Color *color, Ray ray, SceneObject* obj) {
 
             return;
         }
+    }
+}
+
+void Raytracer::draw_lights() {
+    for (Scene::light_iterator l = scene.l_begin(); l != scene.l_end(); l++) {
+        (*l)->addSprite(image);
     }
 }
