@@ -24,13 +24,24 @@ void Raytracer::raytrace() {
 
 void Raytracer::cast_ray_on(int x, int y) {
     Ray view_ray(Vec3(x, y, -100.0), Vec3(0.0, 0.0, 1.0));
+    bool intersected = false;
     for (Scene::iterator scene_obj = scene.begin(); scene_obj != scene.end(); scene_obj++) {
         double t = (*scene_obj)->intersectScalar(view_ray);
         if (t > 0.0) {
+            intersected = true;
             for (Scene::light_iterator l = scene.l_begin(); l != scene.l_end(); l++) {
                 set_pixel_with_color_and_light(x, y, view_ray, scene_obj, t, l);
             }
         }
+    }
+    if(!intersected){
+        Color c = Color(250,250,250);
+        for (Scene::light_iterator l = scene.l_begin(); l != scene.l_end(); l++) {
+            Vec3 lr_dir = (*l)->pos - Vec3(x,y,500.0);
+            Ray lr = Ray(Vec3(x,y,500.0), lr_dir.unit());
+            add_shadow(&c, lr, 0);
+        }
+        set_pixel_rgb(x, y, c);
     }
 }
 
@@ -84,13 +95,13 @@ void Raytracer::add_shadow(Color *color, Ray ray, SceneObject* obj) {
     for (Scene::iterator scene_obj = scene.begin(); scene_obj != scene.end(); scene_obj++) {
         if(obj == (*scene_obj)) continue;
         double t = (*scene_obj)->intersectScalar(ray);
-        double dir = obj->normal(ray.point_on(t)) * (*scene_obj)->normal(ray.point_on(t));
-        if (t > 0.0 && dir < 0.0) {
+//        double dir = obj->normal(ray.point_on(t)) * (*scene_obj)->normal(ray.point_on(t));
+//        if (t > 0.0 && dir < 0.0) {
+        if (t > 0.0){
             color->r = int(color->r * 0.5);
             color->g = int(color->g * 0.5);
             color->b = int(color->b * 0.5);
 
-            return;
         }
     }
 }
