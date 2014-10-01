@@ -14,6 +14,7 @@ public:
     virtual Vec3 normal(Vec3) {}
     Color color;
     double diffusion_coef;
+    double reflection_coef;
 };
 
 class Sphere : public SceneObject {
@@ -22,11 +23,13 @@ public:
                                pos(p){
         color = Color(100,100,100);
         diffusion_coef = 0.9;
+        reflection_coef = 0.1;
     };
     Sphere(double r, Vec3 p, Color c) : radius(r),
                                         pos(p){
         color = c;
         diffusion_coef = 0.9;
+        reflection_coef = 0.1;
     };
 
     double intersectScalar(Ray r);

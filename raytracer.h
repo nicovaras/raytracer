@@ -29,6 +29,12 @@ private:
 
     void draw_ray(Ray lr, Vec3 limit);
     void draw_lights();
+
+    void set_intersected_pixel(int x, int y, Ray view_ray, Scene::iterator scene_obj, double t);
+
+    void set_background_pixel(int x, int y);
+
+    Color reflex_ray_from(Vec3, Vec3&, SceneObject*);
 };
 
 #endif
