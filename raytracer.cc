@@ -63,15 +63,10 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
             B = (*scene_obj)->color.b;
     Color color = Color(R * ka, G * ka, B * ka);
     if (cosine_factor > 0.0f) {
-        Color reflected_color = reflex_ray_from(point, view_ray.getPos(), (*scene_obj));
         color.r += cosine_factor * kd * R;
         color.g += cosine_factor * kd * G;
         color.b += cosine_factor * kd * B;
 
-        double rc =(*scene_obj)->reflection_coef;
-        color.r = std::min(255.,(1 - rc) * color.r + rc * reflected_color.r);
-        color.g = std::min(255.,(1 - rc) * color.g + rc * reflected_color.g);
-        color.b = std::min(255.,(1 - rc) * color.b + rc * reflected_color.b);
 
 
 
@@ -80,6 +75,12 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
 //        draw_ray(lr, (*l)->pos );
         add_shadow(&color, lr, (*scene_obj));
     }
+    Color reflected_color = reflex_ray_from(point, view_ray.getPos(), (*scene_obj));
+    double rc =(*scene_obj)->reflection_coef;
+    color.r =(1 - rc) * color.r + rc * reflected_color.r;
+    color.g =(1 - rc) * color.g + rc * reflected_color.g;
+    color.b =(1 - rc) * color.b + rc * reflected_color.b;
+
     set_pixel_rgb(x, y, color);
 
 }
@@ -138,10 +139,10 @@ Color Raytracer::reflex_ray_from(Vec3 point, Vec3 &dir, SceneObject *obj) {
         if(obj == (*scene_obj))
             continue;
         double t = (*scene_obj)->intersectScalar(new_ray);
-        if (t > 0.0) {
+        if (t < 0.0) {
             for (Scene::light_iterator l = scene.l_begin(); l != scene.l_end(); l++) {
-                Vec3 point = new_ray.point_on(t);
-                double cosine_factor = (*scene_obj)->normal(point) * (*l)->vectorFrom(point);
+                Vec3 new_point = new_ray.point_on(t);
+                double cosine_factor = (*scene_obj)->normal(new_point) * (*l)->vectorFrom(new_point);
                 double ka = scene.ambient_coef;
                 double kd = (*scene_obj)->diffusion_coef;
                 double  R = (*scene_obj)->color.r,
@@ -149,12 +150,11 @@ Color Raytracer::reflex_ray_from(Vec3 point, Vec3 &dir, SceneObject *obj) {
                         B = (*scene_obj)->color.b;
                 if (cosine_factor > 0.0f) {
                     Color color = Color(R * ka, G * ka, B * ka);
-
                     color.r += cosine_factor * kd * R;
                     color.g += cosine_factor * kd * G;
                     color.b += cosine_factor * kd * B;
-                    Vec3 lr_dir = (*l)->pos - point;
-                    Ray lr = Ray(point, lr_dir.unit());
+                    Vec3 lr_dir = (*l)->pos - new_point;
+                    Ray lr = Ray(new_point, lr_dir.unit());
                     add_shadow(&color, lr, (*scene_obj));
                     return color;
 

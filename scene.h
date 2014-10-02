@@ -9,7 +9,7 @@
 
 class SceneObject{
 public:
-    SceneObject() : color(Color(0,0,0)) {};
+    SceneObject() : color(Color(0,0,0)), reflection_coef(0.2), diffusion_coef(0.4) {};
     virtual double intersectScalar(Ray r) {}
     virtual Vec3 normal(Vec3) {}
     Color color;
@@ -22,14 +22,10 @@ public:
     Sphere(double r, Vec3 p) : radius(r),
                                pos(p){
         color = Color(100,100,100);
-        diffusion_coef = 0.9;
-        reflection_coef = 0.1;
     };
     Sphere(double r, Vec3 p, Color c) : radius(r),
                                         pos(p){
         color = c;
-        diffusion_coef = 0.9;
-        reflection_coef = 0.1;
     };
 
     double intersectScalar(Ray r);
