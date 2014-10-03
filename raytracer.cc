@@ -7,7 +7,6 @@ Raytracer::Raytracer(int x, int y, Scene scene) {
     this->scene = scene;
 }
 
-
 void Raytracer::show_result() {
     imshow("Display window", image);
     waitKey(0);
@@ -19,7 +18,7 @@ void Raytracer::raytrace() {
             cast_ray_on(x, y);
         }
     }
-    draw_lights();
+//    draw_lights();
 }
 
 void Raytracer::cast_ray_on(int x, int y) {
@@ -63,18 +62,25 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
             B = (*scene_obj)->color.b;
     Color color = Color(R * ka, G * ka, B * ka);
     if (cosine_factor > 0.0f) {
+
         color.r += cosine_factor * kd * R;
         color.g += cosine_factor * kd * G;
         color.b += cosine_factor * kd * B;
-
-
-
-
         Vec3 lr_dir = (*l)->pos - point;
         Ray lr = Ray(point, lr_dir.unit());
 //        draw_ray(lr, (*l)->pos );
         add_shadow(&color, lr, (*scene_obj));
     }
+    //phong
+    double reflect = 2.0 * ((*l)->dir * (*scene_obj)->normal(point));
+    Vec3 phongDir = (*l)->dir - reflect * (*scene_obj)->normal(point);
+    double phongTerm  = std::max(phongDir * view_ray.getDir(), 0.0);
+    double spec = 3;
+    phongTerm = spec * std::pow(phongTerm, spec);
+    color.r = std::min(255., color.r * phongTerm + color.r);
+    color.b = std::min(255., color.b * phongTerm + color.b);
+    color.g = std::min(255., color.g * phongTerm + color.g);
+
     Color reflected_color = reflex_ray_from(point, view_ray.getPos(), (*scene_obj));
     double rc =(*scene_obj)->reflection_coef;
     color.r =(1 - rc) * color.r + rc * reflected_color.r;
@@ -82,7 +88,6 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
     color.b =(1 - rc) * color.b + rc * reflected_color.b;
 
     set_pixel_rgb(x, y, color);
-
 }
 
 void Raytracer::draw_ray(Ray lr, Vec3 limit) {
@@ -157,9 +162,7 @@ Color Raytracer::reflex_ray_from(Vec3 point, Vec3 &dir, SceneObject *obj) {
                     Ray lr = Ray(new_point, lr_dir.unit());
                     add_shadow(&color, lr, (*scene_obj));
                     return color;
-
                 }
-
             }
         }
     }
