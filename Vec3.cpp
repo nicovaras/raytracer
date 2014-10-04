@@ -10,11 +10,11 @@ Vec3 operator-(Vec3 lhs, Vec3 const &rhs) {
     return Vec3(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 }
 
-Vec3 operator*(float f, const Vec3 &v) {
+Vec3 operator*(double f, const Vec3 &v) {
     return Vec3(v.x * f, v.y * f, v.z * f);
 }
 
-Vec3 operator*(const Vec3 &v, float f) {
+Vec3 operator*(const Vec3 &v, double f) {
     return f * v;
 }
 

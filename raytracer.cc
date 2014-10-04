@@ -57,19 +57,13 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
     double cosine_factor = (*scene_obj)->normal(point) * (*l)->vectorFrom(point);
     double ka = scene.ambient_coef;
     double kd = (*scene_obj)->diffusion_coef;
-    double R = (*scene_obj)->color.r,
-            G = (*scene_obj)->color.g,
-            B = (*scene_obj)->color.b;
-    Color color = Color(R * ka, G * ka, B * ka);
+    Color obj_color = ka * (*scene_obj)->color;
     if (cosine_factor > 0.0f) {
-
-        color.r += cosine_factor * kd * R;
-        color.g += cosine_factor * kd * G;
-        color.b += cosine_factor * kd * B;
+        obj_color = obj_color + cosine_factor * kd * (*scene_obj)->color;
         Vec3 lr_dir = (*l)->pos - point;
         Ray lr = Ray(point, lr_dir.unit());
 //        draw_ray(lr, (*l)->pos );
-        add_shadow(&color, lr, (*scene_obj));
+        add_shadow(&obj_color, lr, (*scene_obj));
     }
     //phong
     double reflect = 2.0 * ((*l)->dir * (*scene_obj)->normal(point));
@@ -77,17 +71,12 @@ void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene
     double phongTerm = std::max(phongDir * view_ray.getDir(), 0.0);
     double spec = 3;
     phongTerm = spec * std::pow(phongTerm, spec);
-    color.r = std::min(255., color.r * phongTerm + color.r);
-    color.b = std::min(255., color.b * phongTerm + color.b);
-    color.g = std::min(255., color.g * phongTerm + color.g);
+    obj_color = obj_color * phongTerm + obj_color;
 
     Color reflected_color = reflex_ray_from(point, view_ray.getPos(), (*scene_obj));
     double rc = (*scene_obj)->reflection_coef;
-    color.r = (1 - rc) * color.r + rc * reflected_color.r;
-    color.g = (1 - rc) * color.g + rc * reflected_color.g;
-    color.b = (1 - rc) * color.b + rc * reflected_color.b;
-
-    set_pixel_rgb(x, y, color);
+    obj_color = (1 - rc) * obj_color + rc * reflected_color;
+    set_pixel_rgb(x, y, obj_color);
 }
 
 void Raytracer::draw_ray(Ray lr, Vec3 limit) {
@@ -108,9 +97,9 @@ void Raytracer::draw_ray(Ray lr, Vec3 limit) {
 }
 
 void Raytracer::set_pixel_rgb(int i, int j, Color color) {
-    image.at<Vec3b>(i, j)[0] = color.b;
-    image.at<Vec3b>(i, j)[1] = color.r;
-    image.at<Vec3b>(i, j)[2] = color.g;
+    image.at<Vec3b>(i, j)[0] = color.b();
+    image.at<Vec3b>(i, j)[1] = color.r();
+    image.at<Vec3b>(i, j)[2] = color.g();
 }
 
 void Raytracer::add_shadow(Color *color, Ray ray, SceneObject *obj) {
@@ -118,9 +107,8 @@ void Raytracer::add_shadow(Color *color, Ray ray, SceneObject *obj) {
         if (obj == (*scene_obj)) continue;
         double t = (*scene_obj)->intersectScalar(ray);
         if (t > 0.0) {
-            color->r = int(color->r * 0.5);
-            color->g = int(color->g * 0.5);
-            color->b = int(color->b * 0.5);
+            *color = 0.5 * (*color);
+
 
         }
     }
@@ -148,14 +136,9 @@ Color Raytracer::reflex_ray_from(Vec3 point, Vec3 &dir, SceneObject *obj) {
                 double cosine_factor = (*scene_obj)->normal(new_point) * (*l)->vectorFrom(new_point);
                 double ka = scene.ambient_coef;
                 double kd = (*scene_obj)->diffusion_coef;
-                double R = (*scene_obj)->color.r,
-                        G = (*scene_obj)->color.g,
-                        B = (*scene_obj)->color.b;
                 if (cosine_factor > 0.0f) {
-                    Color color = Color(R * ka, G * ka, B * ka);
-                    color.r += cosine_factor * kd * R;
-                    color.g += cosine_factor * kd * G;
-                    color.b += cosine_factor * kd * B;
+                    Color color = (*scene_obj)->color * ka;
+                    color = color + cosine_factor * kd * (*scene_obj)->color;
                     Vec3 lr_dir = (*l)->pos - new_point;
                     Ray lr = Ray(new_point, lr_dir.unit());
                     add_shadow(&color, lr, (*scene_obj));

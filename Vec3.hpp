@@ -18,9 +18,9 @@ public:
 
     friend Vec3 operator-(Vec3 lhs, Vec3 const &rhs);
 
-    friend Vec3 operator*(float f, const Vec3 &);
+    friend Vec3 operator*(double f, const Vec3 &);
 
-    friend Vec3 operator*(const Vec3 &, float f);
+    friend Vec3 operator*(const Vec3 &, double f);
 
     friend double operator*(const Vec3 &, const Vec3 &);
 
