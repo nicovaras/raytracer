@@ -7,7 +7,7 @@ add_subdirectory(test)
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(SOURCE_FILES raytracer.cc ray.cpp Vec3.cpp scene.cc light.cc)
+set(SOURCE_FILES raytracer.cc ray.cpp Vec3.cpp scene.cc light.cc sphere.cc)
 add_executable(raytracer main.cpp ${SOURCE_FILES})
 target_link_libraries( raytracer ${OpenCV_LIBS} )
 

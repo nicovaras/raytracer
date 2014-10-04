@@ -3,7 +3,8 @@
 
 class Vec3Test : public ::testing::Test {
 protected:
-    Vec3Test() : vec1_(Vec3(0,0,0)), vec2_(Vec3(0,0,0)) {};
+    Vec3Test() : vec1_(Vec3(0, 0, 0)), vec2_(Vec3(0, 0, 0)) {
+    };
 
     virtual void SetUp() {
         vec1_ = Vec3(1.0, 2.0, 3.0);
@@ -25,9 +26,9 @@ TEST_F(Vec3Test, operatorPlus) {
 
 TEST_F(Vec3Test, operatorScalarProduct) {
     Vec3 res = Vec3(2.0, 4.0, 6.0);
-    ASSERT_EQ(2*vec1_, res);
-    ASSERT_EQ(vec1_*2, res);
-    ASSERT_EQ(0*vec1_, Vec3(0.0,0.0,0.0));
+    ASSERT_EQ(2 * vec1_, res);
+    ASSERT_EQ(vec1_ * 2, res);
+    ASSERT_EQ(0 * vec1_, Vec3(0.0, 0.0, 0.0));
 }
 
 TEST_F(Vec3Test, operatorDotProduct) {

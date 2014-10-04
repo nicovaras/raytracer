@@ -1,6 +1,11 @@
-# TODO reflection
-# TODO refraction
-# TODO ponerle cosas de vector a Color
-# TODO soft shadows
-# TODO cambio POV
 # TODO refactor
+    separar en clases
+    arreglar codigo repetido
+    hacer forward declaraitons
+    pasar a carpeta src
+# TODO ponerle cosas de vector a Color
+# TODO testing
+# TODO cambio POV
+# TODO soft shadows
+# TODO refraction
+

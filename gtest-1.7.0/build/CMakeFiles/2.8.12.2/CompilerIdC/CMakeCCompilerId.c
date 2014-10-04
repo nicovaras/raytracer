@@ -205,7 +205,7 @@
    getting matched.  Store it in a pointer rather than an array
    because some compilers will just produce instructions to fill the
    array rather than assigning a pointer to a static array.  */
-char const* info_compiler = "INFO" ":" "compiler[" COMPILER_ID "]";
+char const *info_compiler = "INFO" ":" "compiler[" COMPILER_ID "]";
 
 /* Identify known platforms by name.  */
 #if defined(__linux) || defined(__linux__) || defined(linux)
@@ -364,8 +364,8 @@ char const info_version[] = {
    getting matched.  Store it in a pointer rather than an array
    because some compilers will just produce instructions to fill the
    array rather than assigning a pointer to a static array.  */
-char const* info_platform = "INFO" ":" "platform[" PLATFORM_ID "]";
-char const* info_arch = "INFO" ":" "arch[" ARCHITECTURE_ID "]";
+char const *info_platform = "INFO" ":" "platform[" PLATFORM_ID "]";
+char const *info_arch = "INFO" ":" "arch[" ARCHITECTURE_ID "]";
 
 
 
@@ -374,16 +374,17 @@ char const* info_arch = "INFO" ":" "arch[" ARCHITECTURE_ID "]";
 #ifdef ID_VOID_MAIN
 void main() {}
 #else
-int main(int argc, char* argv[])
-{
-  int require = 0;
-  require += info_compiler[argc];
-  require += info_platform[argc];
-  require += info_arch[argc];
+
+int main(int argc, char *argv[]) {
+    int require = 0;
+    require += info_compiler[argc];
+    require += info_platform[argc];
+    require += info_arch[argc];
 #ifdef COMPILER_VERSION_MAJOR
   require += info_version[argc];
 #endif
-  (void)argv;
-  return require;
+    (void) argv;
+    return require;
 }
+
 #endif

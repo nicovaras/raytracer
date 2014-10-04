@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 TEST(SampleTest, AssertionTrue) {
-ASSERT_EQ(1, 1);
+    ASSERT_EQ(1, 1);
 }
 
 int main(int argc, char **argv) {

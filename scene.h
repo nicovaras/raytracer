@@ -3,58 +3,46 @@
 #include <vector>
 #include "color.h"
 #include "light.h"
+#include "scene_object.h"
 
 #ifndef SCENE_H
 #define SCENE_H
 
-class SceneObject{
-public:
-    SceneObject() : color(Color(0,0,0)), reflection_coef(0.2), diffusion_coef(0.4) {};
-    virtual double intersectScalar(Ray r) {}
-    virtual Vec3 normal(Vec3) {}
-    Color color;
-    double diffusion_coef;
-    double reflection_coef;
-};
 
-class Sphere : public SceneObject {
+class Scene {
 public:
-    Sphere(double r, Vec3 p) : radius(r),
-                               pos(p){
-        color = Color(100,100,100);
-    };
-    Sphere(double r, Vec3 p, Color c) : radius(r),
-                                        pos(p){
-        color = c;
+    Scene() : ambient_coef(0.1) {
     };
 
-    double intersectScalar(Ray r);
-    Vec3 normal(Vec3);
+    void addToScene(SceneObject *);
 
-    double radius;
-    Vec3 pos;
-};
+    void addToScene(Light *);
 
+    typedef std::vector<SceneObject *>::iterator iterator;
+    typedef std::vector<Light *>::iterator light_iterator;
 
+    iterator begin() {
+        return sceneObjects.begin();
+    }
 
-//Borrar y poner un vector y fue...
-class Scene{
-public:
-    Scene() : ambient_coef(0.1) {};
-    void addToScene(SceneObject*);
-    void addToScene(Light*);
-    typedef std::vector<SceneObject*>::iterator iterator;
-    typedef std::vector<Light*>::iterator light_iterator;
-    iterator begin() { return sceneObjects.begin(); }
-    iterator end() { return sceneObjects.end(); }
-    light_iterator l_begin() { return lights.begin(); }
-    light_iterator l_end() { return lights.end(); }
+    iterator end() {
+        return sceneObjects.end();
+    }
+
+    light_iterator l_begin() {
+        return lights.begin();
+    }
+
+    light_iterator l_end() {
+        return lights.end();
+    }
 
     double ambient_coef;
 
 private:
-    std::vector<SceneObject*> sceneObjects;
-    std::vector<Light*> lights;
+    std::vector<SceneObject *> sceneObjects;
+    std::vector<Light *> lights;
 
 };
+
 #endif
