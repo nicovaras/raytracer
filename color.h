@@ -4,11 +4,17 @@
 #include "Vec3.hpp"
 class Color : public Vec3 {
 public:
-    Color(int r, int g, int b): Vec3(r,g,b){ }
+    Color(int r, int g, int b): Vec3(r,g,b){
+        r = std::min(x, 255.);
+        g = std::min(y, 255.);
+        b = std::min(z, 255.);
+    }
 
-    int r(){ return std::min(x, 255.f);}
-    int g(){ return std::min(y, 255.f);}
-    int b(){ return std::min(z, 255.f);}
+    int r(){ return std::min(x, 255.);}
+    int g(){ return std::min(y, 255.);}
+    int b(){ return std::min(z, 255.);}
+
+
 
     friend Color operator+(Color lhs, Color const &rhs){
         Vec3 v = (Vec3)lhs +  (Vec3)rhs;

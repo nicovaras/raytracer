@@ -5,12 +5,12 @@
 
 class Vec3 {
 public:
-    Vec3(float x, float y, float z) : x(x), y(y), z(z) {
+    Vec3(double x, double y, double z) : x(x), y(y), z(z) {
     }
 
-    float x;
-    float y;
-    float z;
+    double x;
+    double y;
+    double z;
 
     friend std::ostream &operator<<(std::ostream &, const Vec3 &);
 

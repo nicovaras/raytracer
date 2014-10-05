@@ -1,7 +1,7 @@
 # TODO refactor
-    separar en clases
     arreglar codigo repetido
     hacer forward declaraitons
+    poner las funciones como references
     pasar a carpeta src
 # TODO testing
 # TODO cambio POV

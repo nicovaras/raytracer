@@ -28,7 +28,7 @@ private:
 
     void cast_ray_on(int x, int y);
 
-    void set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene::iterator scene_obj, double t, Scene::light_iterator l);
+    void set_pixel_with_color_and_light(int x, int y, Ray view_ray, SceneObject *scene_obj, double t, Scene::light_iterator l);
 
     void add_shadow(Color *, Ray, SceneObject *);
 
@@ -36,11 +36,21 @@ private:
 
     void draw_lights();
 
-    void set_intersected_pixel(int x, int y, Ray view_ray, Scene::iterator scene_obj, double t);
+    void set_intersected_pixel(int x, int y, Ray view_ray, SceneObject *scene_obj, double t);
 
     void set_background_pixel(int x, int y);
 
-    Color reflex_ray_from(Vec3, Vec3 &, SceneObject *);
+    Color reflex_ray_from(Vec3, Vec3 &, SceneObject *, int, Color);
+
+    bool searchIntersection(int x, int y, Ray view_ray);
+
+    Color getLambertLighting(SceneObject *scene_obj, Scene::light_iterator l, Vec3 point);
+
+    double getPhongLighting(Ray view_ray, SceneObject *scene_obj, Scene::light_iterator l, Vec3 point);
+
+    Color getReflectedColor(Ray view_ray, SceneObject *scene_obj, Vec3 point, Color obj_color, int repetitions);
+
+    const static int REFLECT_REPETITIONS = 5;
 };
 
 #endif

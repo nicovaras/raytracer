@@ -23,18 +23,77 @@ void Raytracer::raytrace() {
 
 void Raytracer::cast_ray_on(int x, int y) {
     Ray view_ray(Vec3(x, y, -100.0), Vec3(0.0, 0.0, 1.0));
+    if (!searchIntersection(x, y, view_ray)) {
+        set_background_pixel(x, y);
+    }
+}
+
+bool Raytracer::searchIntersection(int x, int y, Ray view_ray) {
     bool intersected = false;
+
     for (Scene::iterator scene_obj = scene.begin(); scene_obj != scene.end(); scene_obj++) {
         double t = (*scene_obj)->intersectScalar(view_ray);
         if (t > 0.0) {
             intersected = true;
-            set_intersected_pixel(x, y, view_ray, scene_obj, t);
+            set_intersected_pixel(x, y, view_ray, *scene_obj, t);
         }
     }
-    if (!intersected) {
-        set_background_pixel(x, y);
+    return intersected;
+}
+
+
+void Raytracer::set_intersected_pixel(int x, int y, Ray view_ray, SceneObject *scene_obj, double t) {
+    for (Scene::light_iterator l = scene.l_begin(); l != scene.l_end(); l++) {
+        set_pixel_with_color_and_light(x, y, view_ray, scene_obj, t, l);
     }
 }
+
+void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, SceneObject *scene_obj, double t, Scene::light_iterator l) {
+    Vec3 point = view_ray.point_on(t);
+    Color obj_color = getLambertLighting(scene_obj, l, point);
+
+    double phongTerm = getPhongLighting(view_ray, scene_obj, l, point);
+
+    obj_color = obj_color * phongTerm + obj_color;
+    obj_color = getReflectedColor(view_ray, scene_obj, point, obj_color, REFLECT_REPETITIONS);
+
+    Vec3 lr_dir = (*l)->pos - point;
+    Ray lr = Ray(point, lr_dir.unit());
+    add_shadow(&obj_color, lr, scene_obj);
+
+    set_pixel_rgb(x, y, obj_color);
+}
+
+Color Raytracer::getReflectedColor(Ray view_ray, SceneObject *scene_obj, Vec3 point, Color obj_color, int repetitions) {
+    Color reflected_color = reflex_ray_from(point, view_ray.getPos(), scene_obj, repetitions, obj_color);
+    double rc = scene_obj->reflection_coef;
+    obj_color = (1 - rc) * obj_color + rc * reflected_color;
+    return obj_color;
+}
+
+double Raytracer::getPhongLighting(Ray view_ray, SceneObject *scene_obj, Scene::light_iterator l, Vec3 point) {
+    double reflect = 2.0 * ((*l)->dir * scene_obj->normal(point));
+    Vec3 phongDir = (*l)->dir - reflect * scene_obj->normal(point);
+    double phongTerm = max(phongDir * view_ray.getDir(), 0.0);
+    double spec = 3;
+    phongTerm = spec * pow(phongTerm, spec);
+    return phongTerm;
+}
+
+Color Raytracer::getLambertLighting(SceneObject *scene_obj, Scene::light_iterator l, Vec3 point) {
+    double cosine_factor = scene_obj->normal(point) * (*l)->vectorFrom(point);
+    double ka = scene.ambient_coef;
+    double kd = scene_obj->diffusion_coef;
+    if (cosine_factor > 0.0f) {
+        Color obj_color = ka * scene_obj->color;
+
+        obj_color = obj_color + cosine_factor * kd * scene_obj->color;
+        return obj_color;
+//        draw_ray(lr, (*l)->pos );
+    }
+    return Color(0,0,0);
+}
+
 
 void Raytracer::set_background_pixel(int x, int y) {
     Color c = Color(250, 250, 250);
@@ -44,39 +103,6 @@ void Raytracer::set_background_pixel(int x, int y) {
         add_shadow(&c, lr, 0);
     }
     set_pixel_rgb(x, y, c);
-}
-
-void Raytracer::set_intersected_pixel(int x, int y, Ray view_ray, Scene::iterator scene_obj, double t) {
-    for (Scene::light_iterator l = scene.l_begin(); l != scene.l_end(); l++) {
-        set_pixel_with_color_and_light(x, y, view_ray, scene_obj, t, l);
-    }
-}
-
-void Raytracer::set_pixel_with_color_and_light(int x, int y, Ray view_ray, Scene::iterator scene_obj, double t, Scene::light_iterator l) {
-    Vec3 point = view_ray.point_on(t);
-    double cosine_factor = (*scene_obj)->normal(point) * (*l)->vectorFrom(point);
-    double ka = scene.ambient_coef;
-    double kd = (*scene_obj)->diffusion_coef;
-    Color obj_color = ka * (*scene_obj)->color;
-    if (cosine_factor > 0.0f) {
-        obj_color = obj_color + cosine_factor * kd * (*scene_obj)->color;
-        Vec3 lr_dir = (*l)->pos - point;
-        Ray lr = Ray(point, lr_dir.unit());
-//        draw_ray(lr, (*l)->pos );
-        add_shadow(&obj_color, lr, (*scene_obj));
-    }
-    //phong
-    double reflect = 2.0 * ((*l)->dir * (*scene_obj)->normal(point));
-    Vec3 phongDir = (*l)->dir - reflect * (*scene_obj)->normal(point);
-    double phongTerm = std::max(phongDir * view_ray.getDir(), 0.0);
-    double spec = 3;
-    phongTerm = spec * std::pow(phongTerm, spec);
-    obj_color = obj_color * phongTerm + obj_color;
-
-    Color reflected_color = reflex_ray_from(point, view_ray.getPos(), (*scene_obj));
-    double rc = (*scene_obj)->reflection_coef;
-    obj_color = (1 - rc) * obj_color + rc * reflected_color;
-    set_pixel_rgb(x, y, obj_color);
 }
 
 void Raytracer::draw_ray(Ray lr, Vec3 limit) {
@@ -120,9 +146,11 @@ void Raytracer::draw_lights() {
     }
 }
 
-Color Raytracer::reflex_ray_from(Vec3 point, Vec3 &dir, SceneObject *obj) {
+Color Raytracer::reflex_ray_from(Vec3 point, Vec3 &dir, SceneObject *obj, int repetitions, Color color) {
 
-    //TODO CODIGO REPETIDO
+    if(repetitions <= 0)
+        return color;
+
     double reflect = 2.0 * (dir * obj->normal(point));
     Ray new_ray = Ray(point, dir - reflect * obj->normal(point));
 
@@ -133,17 +161,14 @@ Color Raytracer::reflex_ray_from(Vec3 point, Vec3 &dir, SceneObject *obj) {
         if (t < 0.0) {
             for (Scene::light_iterator l = scene.l_begin(); l != scene.l_end(); l++) {
                 Vec3 new_point = new_ray.point_on(t);
-                double cosine_factor = (*scene_obj)->normal(new_point) * (*l)->vectorFrom(new_point);
-                double ka = scene.ambient_coef;
-                double kd = (*scene_obj)->diffusion_coef;
-                if (cosine_factor > 0.0f) {
-                    Color color = (*scene_obj)->color * ka;
-                    color = color + cosine_factor * kd * (*scene_obj)->color;
-                    Vec3 lr_dir = (*l)->pos - new_point;
-                    Ray lr = Ray(new_point, lr_dir.unit());
-                    add_shadow(&color, lr, (*scene_obj));
-                    return color;
-                }
+                color =  getLambertLighting(*scene_obj, l, new_point);
+
+                color = getReflectedColor(new_ray, *scene_obj, point, color, repetitions - 1);
+
+                Vec3 lr_dir = (*l)->pos - point;
+                Ray lr = Ray(point, lr_dir.unit());
+                add_shadow(&color, lr, *scene_obj);
+                return color;
             }
         }
     }
