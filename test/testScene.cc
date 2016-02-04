@@ -1,5 +1,6 @@
 #include "../Vec3.hpp"
 #include "../scene.h"
+#include "../sphere.h"
 #include "gtest/gtest.h"
 
 TEST(Sphere, sphereIntersection) {
